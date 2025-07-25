@@ -1,5 +1,8 @@
 package com.fitnessApp.activityService.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.fitnessApp.activityService.dto.ActivityRequest;
@@ -14,9 +17,16 @@ import lombok.RequiredArgsConstructor;
 public class ActivityService {
 
     private final ActivityRepository activityRepository;
+    private final UserActivityService userActivityService;
 
     public  ActivityResponse trackActivity(ActivityRequest request) {
 
+        boolean isValidUser = userActivityService.validateUser(request.getUserid());
+        if (!isValidUser) { 
+            throw new RuntimeException("Invalid user ID: " + request.getUserid());
+        }
+
+        
         Activity activity= Activity.builder()
         .userid(request.getUserid())
         .type(request.getType())
@@ -47,6 +57,22 @@ public class ActivityService {
         response.setUpdatedAt(activity.getUpdatedAt());
 
         return response;
+    }
+
+    public List<ActivityResponse> getUserActivities(String userid) {
+
+        List<Activity> activities = activityRepository.findByUserid(userid);
+        return activities.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+
+    }
+
+    public ActivityResponse getActivityById(String ActivityId) {
+        return activityRepository.findById(ActivityId)
+                .map(this::mapToResponse)
+                .orElseThrow(() -> new RuntimeException("Activity not found with id: " + ActivityId));
     }
 
 }
