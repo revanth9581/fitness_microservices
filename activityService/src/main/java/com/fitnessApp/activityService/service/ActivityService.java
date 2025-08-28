@@ -3,6 +3,7 @@ package com.fitnessApp.activityService.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fitnessApp.activityService.dto.ActivityRequest;
@@ -18,6 +19,9 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final UserActivityService userActivityService;
+
+    @Autowired
+    private ActivityKafkaProducer activityKafkaProducer;
 
     public  ActivityResponse trackActivity(ActivityRequest request) {
 
@@ -37,6 +41,9 @@ public class ActivityService {
         .build();
 
         Activity savedActivity = activityRepository.save(activity);
+
+
+        activityKafkaProducer.sendActivity(savedActivity);
 
         return mapToResponse(savedActivity);
 

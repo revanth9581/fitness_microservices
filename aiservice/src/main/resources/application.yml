@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: ai-service
+  data:
+    mongodb:
+      url: mongodb://localhost:27017/fitnessrecomendation
+      database: fitnessrecomendation
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ai-service-group1
+      auto-offset-reset: earliest
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+server:
+  port: 8083
+
+app:
+  kafka:
+    topic: fitness2
+
+gemini:
+  api:
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    key: AIzaSyCMijRBodKPlL_OhdZJBEvdhH12i0uA4gk
